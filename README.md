@@ -8,13 +8,12 @@ Create a data processing application that:
 - Fetches financial data from an API
 - Performs calculations on stock ticker data
 - Saves results to a SQLite database
-- Demonstrates proficiency in API integration, data manipulation, and database operations
 
 ## Technical Requirements
 
 ### Input
 - **API Endpoint**: `https://api.test.fiindo.com` (docs: `https://api.test.fiindo.com/api/v1/docs/`)
-- **Authentication**: Use header `Auhtorization: Bearer {first_name}.{last_name}` with every request.
+- **Authentication**: Use header `Auhtorization: Bearer {first_name}.{last_name}` with every request. Anything else WILL BE IGNORED. No other format or value will be accepted.
 - **Template**: This forked repository as starting point
 
 ### Output
@@ -26,23 +25,30 @@ Create a data processing application that:
 ### 1. Data Collection
 - Connect to the Fiindo API
 - Authenticate using your identifier `Auhtorization: Bearer {first_name}.{last_name}`
-- Fetch financial data for multiple stock tickers
+- Fetch financial data
 
 ### 2. Data Calculations
 
+Calculate data for symbols only from those 3 industries:
+  - `Banks - Diversified`
+  - `Software - Application`
+  - `Consumer Electronics`
+
 #### Per Ticker Statistics
-- **PE Ratio**: Price-to-Earnings ratio calculation
+- **PE Ratio**: Price-to-Earnings ratio calculation from last quarter
 - **Revenue Growth**: Quarter-over-quarter revenue growth (Q-1 vs Q-2)
+- **NetIncomeTTM**: Trailing twelve months net income
+- **DebtRatio**: Debt-to-equity ratio from last year
 
 #### Industry Aggregation
 - **Average PE Ratio**: Mean PE ratio across all tickers in each industry
 - **Average Revenue Growth**: Mean revenue growth across all tickers in each industry
+- **Sum of Revenue**: Sum revenue across all tickers in each industry
 
 ### 3. Data Storage
 - Design appropriate database schema
 - Save individual ticker statistics
 - Save aggregated industry data
-- Ensure data integrity and relationships
 
 ## Database Setup
 
@@ -54,7 +60,6 @@ Create a data processing application that:
 ## Getting Started
 
 1. **Fork this repository** to your GitHub account
-2. **Review the database structure** - examine the pre-configured SQLite database and table schemas
 3. **Implement the solution** following the process steps outlined above 
 
 ## Deliverables
@@ -65,16 +70,14 @@ Your completed solution should include:
 - Clean, documented code
 - README with setup and run instructions
 
-## API Documentation
+## Bonus Points
 
-`https://api.test.fiindo.com/api/v1/docs/`
+### Dockerization
+- Containerize your solution using Docker
+- Create a `Dockerfile` and `docker-compose.yml`
 
-## Notes
+### Unit Testing
+- Write comprehensive unit tests for ETL part your solution
 
-- Ensure your solution is production-ready
-- Handle API rate limits and potential timeouts
-- Validate data before processing
-- Include error logging and debugging capabilities
-- Test with various data scenarios
 
 Good luck with your implementation!
