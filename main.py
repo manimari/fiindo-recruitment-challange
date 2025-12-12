@@ -2,7 +2,6 @@
 import asyncio
 from collections import defaultdict
 import logging
-from operator import le
 import statistics
 from sqlalchemy import create_engine 
 from sqlalchemy.orm import sessionmaker 
