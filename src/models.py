@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
-# Tabelle 1: Individuelle Ticker Statistiken (Berechnungsergebnisse)
+# Table 1: Per‑ticker statistics (calculated metrics)
 class TickerStatistics(Base):
     __tablename__ = 'ticker_statistics'
     id = Column(Integer, primary_key=True)
@@ -16,7 +16,7 @@ class TickerStatistics(Base):
     net_income_ttm = Column(Float)
     debt_ratio = Column(Float)
 
-# Tabelle 2: Aggregierte Branchen-Daten
+# Table 2: Aggregated industry metrics
 class IndustryAggregation(Base):
     __tablename__ = 'industry_aggregation'
     id = Column(Integer, primary_key=True)
