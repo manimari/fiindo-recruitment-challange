@@ -1,83 +1,128 @@
-# Fiindo Recruitment Challenge
+# Fiindo Stock Data Aggregation
 
-This repository contains a coding challenge for fiindo candidates. Candidates should fork this repository and implement their solution based on the requirements below.
+This project fetches financial and market data for stock tickers from the Fiindo API, calculates key metrics per ticker, and aggregates them by industry. It provides insight into stock performance, revenue growth, profitability, and debt levels.
 
-## Challenge Overview
+---
 
-Create a data processing application that:
-- Fetches financial data from an API
-- Performs calculations on stock ticker data
-- Saves results to a SQLite database
+## Features
 
-## Technical Requirements
+1. **Per-Ticker Metrics**
 
-### Input
-- **API Endpoint**: `https://api.test.fiindo.com` (docs: `https://api.test.fiindo.com/api/v1/docs/`)
-- **Authentication**: Use header `Auhtorization: Bearer {first_name}.{last_name}` with every request. Anything else WILL BE IGNORED. No other format or value will be accepted.
-- **Template**: This forked repository as starting point
+   For each stock ticker, the following metrics are calculated:
 
-### Output
-- **Database**: SQLite database with processed financial data
-- **Tables**: Individual ticker statistics and industry aggregations
+    **P/E Ratio**  
+    Price-to-Earnings ratio, measures stock price relative to earnings  
+    `P/E = Latest Adjusted Close Price / EPS Diluted (Latest Quarter)` 
 
-## Process Steps
+    **Revenue Growth**  
+    Quarter-over-quarter revenue growth  
+    `Revenue Growth % = (Revenue_latest - Revenue_previous) / Revenue_previous * 100` 
 
-### 1. Data Collection
-- Connect to the Fiindo API
-- Authenticate using your identifier `Auhtorization: Bearer {first_name}.{last_name}`
-- Fetch financial data
+    **Net Income TTM**  
+    Trailing Twelve Months net income, sum of last 4 quarters  
+    `Net Income TTM = sum of net income of last 4 consecutive quarters` 
 
-### 2. Data Calculations
+    **Debt Ratio**  
+    Debt-to-Equity ratio for the latest fiscal year  
+    `Debt Ratio = Total Liabilities / Total Equity` 
 
-Calculate data for symbols only from those 3 industries:
-  - `Banks - Diversified`
-  - `Software - Application`
-  - `Consumer Electronics`
+   > **Note:** P/E ratios may appear unusually high for some tickers due to low EPS in a quarter, different currencies, or one-off accounting events.
 
-#### Per Ticker Statistics
-- **PE Ratio**: Price-to-Earnings ratio calculation from last quarter
-- **Revenue Growth**: Quarter-over-quarter revenue growth (Q-1 vs Q-2)
-- **NetIncomeTTM**: Trailing twelve months net income
-- **DebtRatio**: Debt-to-equity ratio from last year
+2. **Industry Aggregation**
 
-#### Industry Aggregation
-- **Average PE Ratio**: Mean PE ratio across all tickers in each industry
-- **Average Revenue Growth**: Mean revenue growth across all tickers in each industry
-- **Sum of Revenue**: Sum revenue across all tickers in each industry
+   Metrics are aggregated across all tickers in an industry:
 
-### 3. Data Storage
-- Design appropriate database schema
-- Save individual ticker statistics
-- Save aggregated industry data
+   **Average P/E Ratio**  
+   Mean P/E across tickers in the industry  
+   `Average P/E = mean(per-ticker P/E)` 
 
-## Database Setup
+   **Average Revenue Growth**  
+   Mean revenue growth across tickers  
+   `Average Revenue Growth = mean(per-ticker revenue growth %)` 
 
-### Database Files
-- `fiindo_challenge.db`: SQLite database file
-- `models.py`: SQLAlchemy model definitions (can be divided into separate files if needed)
-- `alembic/`: Database migration management
+   **Sum of Revenue**  
+   Sum of the latest quarterly revenue across tickers  
+   `Sum Revenue = sum(latest quarter revenue per ticker)` 
 
-## Getting Started
+---
 
-1. **Fork this repository** to your GitHub account
-3. **Implement the solution** following the process steps outlined above 
+## Allowed Industries
 
-## Deliverables
+Only tickers in the following industries are included:
 
-Your completed solution should include:
-- Working application that fetches data from the API
-- SQLite database with calculated results
-- Clean, documented code
-- README with setup and run instructions
+- Banks - Diversified  
+- Software - Application  
+- Consumer Electronics  
 
-## Bonus Points
+---
 
-### Dockerization
-- Containerize your solution using Docker
-- Create a `Dockerfile` and `docker-compose.yml`
+## Requirements
 
-### Unit Testing
-- Write comprehensive unit tests for ETL part your solution
+- Python 3.10+  
+- Packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Fiindo API credentials: 
+```
+FIRST_NAME = "your_first_name"
+LAST_NAME = "your_last_name" 
+``` 
+
+Replace the placeholder values with your actual Fiindo API credentials.
 
 
-Good luck with your implementation!
+## Usage
+
+Run the main script to fetch data and calculate metrics:
+``` python main.py```
+
+
+Run unit tests to verify correctness:
+```pytest test.py``` 
+
+## Running with Docker
+
+You can run the application using Docker and Docker Compose without manually installing Python or dependencies.
+
+**Build and Run**
+
+From the project root directory: 
+`````` 
+
+ - This will build the Docker image and start a container named fiindo_app.
+
+ - The container will run python main.py, fetching financial data, performing calculations, and writing results to the SQLite database fiindo_challenge.db.
+
+ - Any logs and output will be shown in the terminal. 
+
+**Stop the Container**
+
+```docker-compose down``` 
+
+Stops and removes the container but keeps the database file. 
+
+## Notes
+
+Multiple entries for the same quarter are handled using the timescheme. The latest quarter is selected based on the smallest timescheme number.
+
+Missing or zero values in EPS, revenue, or balance sheet fields are handled gracefully to prevent errors.
+
+All metrics are based on quarterly data; TTM adjustments are applied only where relevant.
+
+Results are stored in a SQLite database fiindo_challenge.db with two tables:
+
+  - TickerStatistics – per-ticker metrics
+
+  - IndustryAggregation – aggregated metrics per industry 
+
+Some tickers are skipped during processing and therefore do not appear in the database:
+ - If one of the required API calls for that symbol fails (for example, HTTP 500 on income statement or balance sheet), so income, balance sheet, or EOD data is missing.
+ - If no valid latest quarterly income data can be determined (for example, no quarterly entries or missing fields required for the calculations).
+In these cases, a warning is logged (e.g. “Skipping WDI.SW due to missing data.”), and the ticker is excluded from per-ticker and industry-level results.
+
+
