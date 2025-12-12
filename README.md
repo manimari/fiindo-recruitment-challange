@@ -92,7 +92,7 @@ You can run the application using Docker and Docker Compose without manually ins
 **Build and Run**
 
 From the project root directory: 
-`````` 
+```docker-compose up --build```
 
  - This will build the Docker image and start a container named fiindo_app.
 
